@@ -96,14 +96,23 @@ func OctogonalStep(x, y, maxx, maxy, inst int) (nextx, nexty int) {
 
 func OpenSSH(instructions []byte) (ret [SSH_FLDSIZE_Y][SSH_FLDSIZE_X]byte) {
 	const augmentation_string = " .o+=*BOX@%&#/^SE"
+	l := len(augmentation_string) - 1
 
 	var field [SSH_FLDSIZE_X][SSH_FLDSIZE_Y]int
+	var lastx, lasty int
 
 	augment := func(x, y int) {
-		field[x][y]++
+		lastx, lasty = x, y
+		if field[x][y] < l-2 {
+			field[x][y]++
+		}
 	}
 
 	Generic(instructions, 2, SSH_FLDSIZE_X/2, SSH_FLDSIZE_Y/2, SSH_FLDSIZE_X, SSH_FLDSIZE_Y, DiagonalStep, augment)
+
+	// Mark starting point and end point.
+	field[SSH_FLDSIZE_X/2][SSH_FLDSIZE_Y/2] = l - 1
+	field[lastx][lasty] = l
 
 	for x := 0; x < SSH_FLDSIZE_X; x++ {
 		for y := 0; y < SSH_FLDSIZE_Y; y++ {
